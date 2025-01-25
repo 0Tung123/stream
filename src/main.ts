@@ -45,7 +45,6 @@ async function bootstrap() {
 				client: redis,
 				prefix: config
 					.getOrThrow<string>('SESSION_FOLDER')
-					.replace(':', '')
 			})
 		})
 	)
