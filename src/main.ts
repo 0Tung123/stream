@@ -11,12 +11,12 @@ import { ms, type StringValue } from './shared/utils/ms.utils'
 import { parseBoolean } from './shared/utils/parse-boolean.utils'
 
 async function bootstrap() {
-	const app = await NestFactory.create(CoreModule)
+	const app = await NestFactory.create(CoreModule, { rawBody: true })
 
 	const config = app.get(ConfigService)
 	const redis = app.get(RedisService)
 
-	app.use(cookieParser(config.getOrThrow<string>('COOKIE_SECRET')))
+	app.use(cookieParser(config.getOrThrow<string>('COOKIES_SECRET')))
 
 	app.useGlobalPipes(
 		new ValidationPipe({
@@ -43,17 +43,18 @@ async function bootstrap() {
 			},
 			store: new RedisStore({
 				client: redis,
-				prefix: config.getOrThrow<string>('SESSION_FOLDER')
+				prefix: config
+					.getOrThrow<string>('SESSION_FOLDER')
+					.replace(':', '')
 			})
 		})
 	)
 
 	app.enableCors({
-		credentials: true,
 		origin: config.getOrThrow<string>('ALLOWED_ORIGIN'),
-		exposeHeaders: ['set-cookie']
+		credentials: true,
+		exposedHeaders: ['set-cookie']
 	})
-
 	await app.listen(config.getOrThrow<number>('APPLICATION_PORT'))
 }
 bootstrap()
