@@ -4,7 +4,7 @@ import { GqlExecutionContext } from '@nestjs/graphql'
 import type { User } from '@/prisma/generated'
 
 export const Authorized = createParamDecorator((data, ctx) => {
-	;(data: keyof User, ctx: ExecutionContext) => {
+	(data: keyof User, ctx: ExecutionContext) => {
 		let user: User
 		if (ctx.getType() === 'http') {
 			user = ctx.switchToHttp().getRequest().user
